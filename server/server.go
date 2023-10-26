@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -12,6 +11,8 @@ import (
 	db "github.com/dilshat/bank/db/gen"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type server struct {
@@ -63,7 +64,7 @@ func (s *server) WithdrawMoney(ctx context.Context, in *pb.WithdrawMoneyRequest)
 	}
 
 	if rowsAffected == 0 {
-		return nil, errors.New("balance is not enough")
+		return nil, status.Errorf(codes.FailedPrecondition, "balance is not enough")
 	}
 
 	newBalance, err := s.ds.GetClientBalance(ctx, int64(in.ClientId))
