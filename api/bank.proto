@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option go_package = "github.com/dilshat/bank/api";
+
+package api;
+
+service BankServer {
+  rpc AddClient (AddClientRequest) returns (AddClientReply) {}
+  rpc DepositMoney(DepositMoneyRequest) returns (DepositMoneyReply){}
+  rpc WithdrawMoney(WithdrawMoneyRequest) returns (WithdrawMoneyReply){}
+}
+
+
+message AddClientRequest {
+  string fio = 1;
+  string phone = 2;
+}
+
+message AddClientReply {
+  int32 clientId = 1;
+}
+
+message DepositMoneyRequest{
+  int32 clientId = 1;
+  int32 amount = 2;
+}
+
+message DepositMoneyReply{
+  int32 balance = 1;
+}
+
+message WithdrawMoneyRequest{
+  int32 clientId = 1;
+  int32 amount = 2;
+}
+
+message WithdrawMoneyReply{
+  int32 balance = 1;
+}

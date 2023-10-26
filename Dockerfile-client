@@ -1,0 +1,21 @@
+FROM golang:1.19 AS builder
+
+WORKDIR /src
+
+# Add source code
+COPY . .
+
+# Download dependencies
+RUN go mod download
+
+
+RUN CGO_ENABLED=0 go build -o clnt ./client/client.go
+
+FROM alpine AS production
+RUN apk --no-cache add ca-certificates bash make
+
+WORKDIR /app
+# Retrieve the binary from the previous stage
+COPY --from=builder /src/clnt .
+
+CMD ["./clnt"]

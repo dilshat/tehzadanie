@@ -1,0 +1,62 @@
+version: "3.8"
+
+volumes:
+  postgres:
+
+services:
+
+  # database
+  postgres:
+    image: postgres:13
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    healthcheck:
+      test: pg_isready -U ${DB_USER} -d ${DB_NAME}
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # run migration scripts
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - ./db/migration:/migration
+    command: ["-path", "/migration", "-database",  "postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?sslmode=disable", "up"]
+    links: 
+      - postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # server
+  server:      
+    ports:
+      - 50051:50051
+    build:
+      context: .
+      dockerfile: Dockerfile-server
+    depends_on:
+      migrate:
+        condition: service_completed_successfully    
+      postgres:
+        condition: service_healthy
+
+  # client
+  client:      
+    build:
+      context: .
+      dockerfile: Dockerfile-client
+    depends_on:
+      migrate:
+        condition: service_completed_successfully    
+      postgres:
+        condition: service_healthy
+      server:
+        condition: service_started  
