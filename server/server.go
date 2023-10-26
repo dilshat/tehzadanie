@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 
 	pb "github.com/dilshat/bank/api"
 	db "github.com/dilshat/bank/db/gen"
@@ -77,16 +78,11 @@ func newServer(conn *pgxpool.Pool, ds *db.Queries) *server {
 	return &server{conn: conn, ds: ds}
 }
 
-// TODO load from env vars
-const port = 50051
-const DbUser = "postgres"
-const DbPassword = "secret"
-const DbAddress = "postgres:5432"
-const DbName = "bank"
-
 func main() {
 
-	conn, err := pgxpool.Connect(context.Background(), fmt.Sprintf("postgresql://%s:%s@%s/%s", DbUser, DbPassword, DbAddress, DbName))
+	conn, err := pgxpool.Connect(
+		context.Background(), fmt.Sprintf("postgresql://%s:%s@%s/%s",
+			os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_DB_ADDR"), os.Getenv("POSTGRES_DB")))
 	if err != nil {
 		log.Fatalf("failed to open connection to database: %v", err)
 	}
@@ -96,7 +92,7 @@ func main() {
 	s := grpc.NewServer()
 	pb.RegisterBankServerServer(s, server)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", os.Getenv("PORT")))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

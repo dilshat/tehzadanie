@@ -37,6 +37,12 @@ services:
 
   # server
   server:      
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_DB_ADDR: postgres:5432
+      PORT: 50051
     ports:
       - 50051:50051
     build:
@@ -49,7 +55,9 @@ services:
         condition: service_healthy
 
   # client
-  client:      
+  client:   
+    environment:
+      SERVER_ADDR: server:50051
     build:
       context: .
       dockerfile: Dockerfile-client
@@ -60,3 +68,8 @@ services:
         condition: service_healthy
       server:
         condition: service_started  
+
+
+networks:
+  default:
+    name: armhr-network

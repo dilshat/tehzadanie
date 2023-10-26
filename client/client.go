@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
 	pb "github.com/dilshat/bank/api"
@@ -10,12 +11,9 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// TODO load from env vars
-const serverAddr = "localhost:50051"
-
 func main() {
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(serverAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(os.Getenv("SERVER_ADDR"), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
