@@ -20,7 +20,7 @@ func main() {
 	defer conn.Close()
 
 	c := pb.NewBankServerClient(conn)
-
+	
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
