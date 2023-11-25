@@ -21,6 +21,7 @@ func main() {
 
 	c := pb.NewBankServerClient(conn)
 
+	// this is a test comment
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 

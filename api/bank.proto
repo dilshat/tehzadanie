@@ -33,7 +33,7 @@ message WithdrawMoneyRequest{
   int32 clientId = 1;
   int32 amount = 2;
 }
-
+// this is a test comment
 message WithdrawMoneyReply{
   int32 balance = 1;
 }
