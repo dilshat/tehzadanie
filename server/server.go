@@ -87,7 +87,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to open connection to database: %v", err)
 	}
-
+	
 	server := newServer(conn, db.New(conn))
 
 	s := grpc.NewServer()
